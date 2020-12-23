@@ -2,3 +2,4 @@ name: CustomCompass
 version: 1.0
 main: de.jo.customcompass.Main
 author: Command_Jo
+api-version: 1.13
