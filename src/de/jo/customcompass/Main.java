@@ -23,38 +23,37 @@ public class Main extends JavaPlugin implements Listener{
 	public void onEnable() {
 		Bukkit.getConsoleSender().sendMessage("Custom Compass aktiviert!");
 		Bukkit.getPluginManager().registerEvents(this, this);
-		Bukkit.getScheduler().scheduleSyncRepeatingTask(this, new Runnable() {
-			
-			@Override
-			public void run() {
-				Bukkit.getOnlinePlayers().forEach(player -> {
-					try {
-						player.setCompassTarget(locations.get(player).getLocation());
-					} catch (NullPointerException e) {
-					}
-				});
+		Bukkit.getScheduler().scheduleSyncRepeatingTask(this, () -> Bukkit.getOnlinePlayers().forEach(player -> {
+			try {
+				player.setCompassTarget(locations.get(player).getLocation());
+			} catch (NullPointerException e) {
+				e.printStackTrace();
 			}
-		}, 1, 10);
+		}), 1, 10);
 	}
-	
-	@SuppressWarnings("deprecation")
+
 	@EventHandler
 	public void onInteract(PlayerInteractAtEntityEvent event) {
-		Player player = event.getPlayer();
-		Entity entity = event.getRightClicked();
+		final Player player = event.getPlayer();
+		final Entity entity = event.getRightClicked();
+
 		ItemStack is = new ItemStack(Material.COMPASS);
 		ItemMeta meta = is.getItemMeta();
-		meta.addItemFlags(ItemFlag.HIDE_ENCHANTS);
-		meta.addEnchant(Enchantment.DURABILITY, 1, true);
+
+		if (meta != null) {
+			meta.addItemFlags(ItemFlag.HIDE_ENCHANTS);
+			meta.addEnchant(Enchantment.DURABILITY, 1, true);
+		}
 		is.setItemMeta(meta);
-		if(player.getItemInHand() != null && player.getItemInHand().getType() == Material.COMPASS) {
-			player.setItemInHand(is);
+
+		if(player.getInventory().getItemInMainHand().getType().equals(Material.COMPASS)) {
+			player.getInventory().setItemInMainHand(is);
 			try {
 				locations.remove(player);
 			} catch (NullPointerException e) {
+				e.printStackTrace();
 			}
 			locations.put(player, entity);
 		}
  	}
-	
 }
